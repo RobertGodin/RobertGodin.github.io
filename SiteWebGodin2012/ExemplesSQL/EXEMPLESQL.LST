@@ -1,0 +1,292 @@
+CREATE TABLE Client
+  2  (noClient   INTEGER PRIMARY KEY,
+  3   nomClient   VARCHAR(15),
+  4   noTéléphone   VARCHAR(15))
+  5  ;
+
+Table créée.
+
+SQL> CREATE TABLE Compte
+  2  (noCompte    INTEGER,
+  3   solde    DECIMAL(10,2) CHECK (solde > 0),
+  4   dateOuverture   DATE,
+  5   noClient   INTEGER REFERENCES Client)
+  6  ;
+
+Table créée.
+
+SQL> CREATE TABLE Prêt
+  2  (noPrêt    INTEGER,
+  3   montantPrêt   DECIMAL(10,2),
+  4   dateDébut   DATE,
+  5   tauxIntérêt  DECIMAL(8,2),
+  6   fréquencePaiement INTEGER,
+  7   noClient   INTEGER REFERENCES Client)
+  8  ;
+
+Table créée.
+
+SQL> INSERT INTO Client VALUES(
+  2  ;
+
+*
+ERREUR à la ligne 2:
+ORA-00936: Expression absente 
+
+
+SQL> drop table Client Cascade constraits;
+drop table Client Cascade constraits
+                          *
+ERREUR à la ligne 1:
+ORA-00905: Mot clé absent 
+
+
+SQL> drop table compte;
+
+Table supprimée.
+
+SQL> drop table prêt;
+
+Table supprimée.
+
+SQL> drop table client;
+
+Table supprimée.
+
+SQL> CREATE TABLE Client
+  2  (noClient   INTEGER PRIMARY KEY,
+  3   nomClient   VARCHAR(15),
+  4   adresseClient  VARCHAR(20),
+  5   noTéléphone   VARCHAR(15))
+  6  ;
+
+Table créée.
+
+SQL> CREATE TABLE Compte
+  2  (noCompte    INTEGER,
+  3   solde    DECIMAL(10,2) CHECK (solde > 0),
+  4   dateOuverture   DATE,
+  5   noClient   INTEGER REFERENCES Client)
+  6  ;
+
+Table créée.
+
+SQL> CREATE TABLE Prêt
+  2  (noPrêt    INTEGER,
+  3   montantPrêt   DECIMAL(10,2),
+  4   dateDébut   DATE,
+  5   tauxIntérêt  DECIMAL(8,2),
+  6   fréquencePaiement INTEGER,
+  7   noClient   INTEGER REFERENCES Client)
+  8  ;
+
+Table créée.
+
+SQL> INSERT INTO Client VALUES(10,'Hugh Paycheck','Ottawa','(999)999-9999');
+
+1 ligne créée.
+
+SQL> INSERT INTO Client VALUES(20,'Dollard Cash','Montréal','(888)888-8888');
+
+1 ligne créée.
+
+SQL> INSERT INTO Client VALUES(30,'Ye San Le Su','Montréal','(777)777-7777');
+
+1 ligne créée.
+
+SQL> SELECT * FROM Client;
+
+ NOCLIENT NOMCLIENT       ADRESSECLIENT        NOTÉLÉPHONE                                          
+--------- --------------- -------------------- ---------------                                      
+       10 Hugh Paycheck   Ottawa               (999)999-9999                                        
+       20 Dollard Cash    Montréal             (888)888-8888                                        
+       30 Ye San Le Su    Montréal             (777)777-7777                                        
+
+SQL> COMMIT;
+
+Validation effectuée.
+
+SQL> INSERT INTO Compte VALUES(;
+INSERT INTO Compte VALUES(
+                         *
+ERREUR à la ligne 1:
+ORA-00936: Expression absente 
+
+
+SQL> drop table Compte;
+
+Table supprimée.
+
+SQL> CREATE TABLE Compte
+  2  (noCompte    INTEGER,
+  3   solde    DECIMAL(10,2) CHECK (solde >= 0),
+  4   dateOuverture   DATE,
+  5   noClient   INTEGER REFERENCES Client)
+  6  ;
+
+Table créée.
+
+SQL> INSERT INTO Compte VALUES(100, 1000.0,'5/05/1999', 10);
+
+1 ligne créée.
+
+SQL> INSERT INTO Client VALUES(10,'Dollard Cash','Montréal','(888)888-8888');
+INSERT INTO Client VALUES(10,'Dollard Cash','Montréal','(888)888-8888')
+            *
+ERREUR à la ligne 1:
+ORA-00001: violation de contrainte unique (BANQUE.SYS_C001589) 
+
+
+SQL> COMMIT;
+
+Validation effectuée.
+
+SQL> SELECT * FROM Compte;
+
+ NOCOMPTE     SOLDE DATEOUVE  NOCLIENT                                                              
+--------- --------- -------- ---------                                                              
+      100      1000 05/05/99        10                                                              
+      200      2000 10/10/99        20                                                              
+      300      1000 10/10/99        10                                                              
+      400         5 20/07/00        30                                                              
+      600        10 15/10/00        30                                                              
+
+SQL> SELECT * FROM Prêt;
+
+   NOPRÊT MONTANTPRÊT DATEDÉBU TAUXINTÉRÊT FRÉQUENCEPAIEMENT  NOCLIENT                              
+--------- ----------- -------- ----------- ----------------- ---------                              
+     1000       10000 10/06/00          10                12        10                              
+     2000       20000 20/07/00          12                52        30                              
+     3000        5000 15/08/00          12                12        10                              
+
+SQL> SELECT noCompte, solde
+  2  FROM Compte
+  3  WHERE noClient = 10;
+
+ NOCOMPTE     SOLDE                                                                                 
+--------- ---------                                                                                 
+      100      1000                                                                                 
+      300      1000                                                                                 
+
+SQL> CREATE INDEX ON Compte(noClient);
+CREATE INDEX ON Compte(noClient)
+             *
+ERREUR à la ligne 1:
+ORA-00953: nom d'index manquant ou non valide 
+
+
+SQL> CREATE INDEX indexNoClientCompte ON Compte(noClient);
+
+Index créé.
+
+SQL> SELECT nomClient, noCompte, solde
+  2  FROM Client, Compte
+  3  WHERE Client.noClient = Compte.noClient AND
+  4        dateOuverture = '10/10/2000';
+
+aucune ligne sélectionnée
+
+SQL> SELECT nomClient, noCompte, solde
+  2  FROM Client, Compte
+  3  WHERE Client.noClient = Compte.noClient AND
+  4        dateOuverture = '10/10/1999';
+
+NOMCLIENT        NOCOMPTE     SOLDE                                                                 
+--------------- --------- ---------                                                                 
+Dollard Cash          200      2000                                                                 
+Hugh Paycheck         300      1000                                                                 
+
+SQL> UPDATE Compte
+  2  SET solde = solde + 100
+  3  WHERE noCompte = 100
+  4  ;
+
+1 ligne mise à jour.
+
+SQL> SELECT solde FROM Compte WHERE noCompte = 100;
+
+    SOLDE                                                                                           
+---------                                                                                           
+     1100                                                                                           
+
+SQL> rollback;
+
+Annulation (ROLLBACK) effectuée.
+
+SQL> UPDATE Compte
+  2  SET solde = solde + 100
+  3  WHERE noCompte = 200;
+
+1 ligne mise à jour.
+
+SQL> DELETE FROM Compte WHERE noCompte = 100;
+
+1 ligne supprimée.
+
+SQL> SELECT * FROM Compte;
+
+ NOCOMPTE     SOLDE DATEOUVE  NOCLIENT                                                              
+--------- --------- -------- ---------                                                              
+      200      2100 10/10/99        20                                                              
+      300      1000 10/10/99        10                                                              
+      400         5 20/07/00        30                                                              
+      600        10 15/10/00        30                                                              
+
+SQL> SELECT * FROM USER_TABLES;
+
+TABLE_NAME                     TABLESPACE_NAME                CLUSTER_NAME                          
+------------------------------ ------------------------------ ------------------------------        
+IOT_NAME                        PCT_FREE  PCT_USED INI_TRANS MAX_TRANS INITIAL_EXTENT NEXT_EXTENT   
+------------------------------ --------- --------- --------- --------- -------------- -----------   
+MIN_EXTENTS MAX_EXTENTS PCT_INCREASE FREELISTS FREELIST_GROUPS LOG B  NUM_ROWS    BLOCKS            
+----------- ----------- ------------ --------- --------------- --- - --------- ---------            
+EMPTY_BLOCKS AVG_SPACE CHAIN_CNT AVG_ROW_LEN AVG_SPACE_FREELIST_BLOCKS NUM_FREELIST_BLOCKS          
+------------ --------- --------- ----------- ------------------------- -------------------          
+DEGREE     INSTANCES  CACHE TABLE_LO SAMPLE_SIZE LAST_ANA PAR IOT_TYPE     T NES BUFFER_            
+---------- ---------- ----- -------- ----------- -------- --- ------------ - --- -------            
+CLIENT                         USER_DATA                                                            
+                                      10        40         1       255          10240       10240   
+          1         121           50         1               1 YES N                                
+                                                                                                    
+         1          1     N ENABLED                       NO               N NO  DEFAULT            
+                                                                                                    
+COMPTE                         USER_DATA                                                            
+                                      10        40         1       255          10240       10240   
+          1         121           50         1               1 YES N                                
+                                                                                                    
+         1          1     N ENABLED                       NO               N NO  DEFAULT            
+                                                                                                    
+PRÊT                           USER_DATA                                                            
+
+TABLE_NAME                     TABLESPACE_NAME                CLUSTER_NAME                          
+------------------------------ ------------------------------ ------------------------------        
+IOT_NAME                        PCT_FREE  PCT_USED INI_TRANS MAX_TRANS INITIAL_EXTENT NEXT_EXTENT   
+------------------------------ --------- --------- --------- --------- -------------- -----------   
+MIN_EXTENTS MAX_EXTENTS PCT_INCREASE FREELISTS FREELIST_GROUPS LOG B  NUM_ROWS    BLOCKS            
+----------- ----------- ------------ --------- --------------- --- - --------- ---------            
+EMPTY_BLOCKS AVG_SPACE CHAIN_CNT AVG_ROW_LEN AVG_SPACE_FREELIST_BLOCKS NUM_FREELIST_BLOCKS          
+------------ --------- --------- ----------- ------------------------- -------------------          
+DEGREE     INSTANCES  CACHE TABLE_LO SAMPLE_SIZE LAST_ANA PAR IOT_TYPE     T NES BUFFER_            
+---------- ---------- ----- -------- ----------- -------- --- ------------ - --- -------            
+                                      10        40         1       255          10240       10240   
+          1         121           50         1               1 YES N                                
+                                                                                                    
+         1          1     N ENABLED                       NO               N NO  DEFAULT            
+                                                                                                    
+
+SQL> SELECT * FROM USER_COLUMNS;
+SELECT * FROM USER_COLUMNS
+              *
+ERREUR à la ligne 1:
+ORA-00942: Table ou vue inexistante 
+
+
+SQL> SELECT TABLE_NAME, BLOCKS FROM USER_TABLES;
+
+TABLE_NAME                        BLOCKS                                                            
+------------------------------ ---------                                                            
+CLIENT                                                                                              
+COMPTE                                                                                              
+PRÊT                                                                                                
+
+SQL> exit;
